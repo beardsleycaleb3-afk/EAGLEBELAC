@@ -4,7 +4,7 @@
   "description": "Audio-reactive 3D music visualizer PWA",
   "start_url": "/",
   "scope": "/",
-  "display": "fullscreen",
+  "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "fullscreen"],
   "background_color": "#000000",
   "theme_color": "#111111",

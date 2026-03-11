@@ -1,12 +1,36 @@
 {
   "name": "EAGLEBELAC",
   "short_name": "EAGLEBELAC",
-  "start_url": "/index.html",
+  "description": "Audio-reactive 3D music visualizer PWA",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
   "background_color": "#000000",
   "theme_color": "#111111",
+  "orientation": "landscape",
+  "categories": ["music", "entertainment"],
   "icons": [
-    {"src": "icon.jpg", "sizes": "192x192", "type": "image/jpeg"},
-    {"src": "icon.jpg", "sizes": "512x512", "type": "image/jpeg"}
+    {
+      "src": "icon.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon.jpg", 
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Play Music Visuals",
+      "short_name": "Visuals",
+      "description": "Launch EAGLEBELAC music visualizer",
+      "url": "/",
+      "icons": [{ "src": "icon.jpg", "sizes": "192x192" }]
+    }
   ]
 }

@@ -98,17 +98,39 @@
         function initAudio() { if(!audioContext) { audioContext = new (window.AudioContext || window.webkitAudioContext)(); analyser = audioContext.createAnalyser(); analyser.fftSize = 1024; } if(audioContext.state === 'suspended') audioContext.resume(); }
         function clearAllCores() { spawnedCores.forEach(c => scene.remove(c.mesh)); spawnedCores.length = 0; }
         function cycle(idx) {
-            clearAllCores();
-            if(currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; if(source) source.disconnect(); }
-            currentTrack = idx; currentAudio = audioElements[idx]; subIndex = 0;
-            initAudio(); source = audioContext.createMediaElementSource(currentAudio); source.connect(analyser); analyser.connect(audioContext.destination);
-            currentAudio.currentTime = 0; currentAudio.play();
-            frame.className = `frame-${['red','green','blue','yellow','violet'][idx]}`;
-            mainCore.material.uniforms.tex.value = coreTextures[idx][0];
-            document.querySelectorAll('.b').forEach(b => b.classList.remove('active'));
-            document.getElementById(`btn${idx}`).classList.add('active');
-            for(let i=0; i<16; i++) spawnCores(1, new THREE.Vector3((Math.random()-0.5)*20, (Math.random()-0.5)*20, 0));
-        }
+    initAudio();
+    
+    // Always pause current audio first
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+    }
+    
+    // Properly disconnect source node
+    if (source) {
+        source.disconnect();
+        source = null;
+    }
+    
+    // Switch to new track
+    currentAudio = audioElements[idx];
+    source = audioContext.createMediaElementSource(currentAudio);
+    source.connect(analyser);
+    
+    currentAudio.currentTime = 0;
+    currentAudio.play();
+    
+    // Visual updates
+    clearAllCores();
+    mainCore.material.uniforms.tex.value = coreTextures[idx][subIndex];
+    subIndex = (subIndex + 1) % 5;
+    spawnCores(16);
+    
+    // Update UI
+    document.querySelectorAll('.b').forEach(b => b.classList.remove('active'));
+    document.getElementById(`btn${idx}`).classList.add('active');
+    currentTrack = idx;
+}
         function spawnCores(count, center) {
             for(let i=0; i<count; i++) {
                 let mesh = corePool.length ? corePool.pop() : mainCore.clone();

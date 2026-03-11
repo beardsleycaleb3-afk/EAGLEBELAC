@@ -5,7 +5,7 @@ const FILES_TO_CACHE = [
     'index.html',
     'manifest.json',
     'sw.js',
-    'icon.jpg',  // Fixed duplicate
+    'icon-512.jpg',  // Fixed duplicate
 
     // Audio files
     '1.mp3',

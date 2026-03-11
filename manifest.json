@@ -30,7 +30,7 @@
       "short_name": "Visuals",
       "description": "Launch EAGLEBELAC music visualizer",
       "url": "/",
-      "icons": [{ "src": "icon-512.jpg", "sizes": "192x192" }]
+      "icons": [{ "src": "icon-192.jpg", "sizes": "192x192" }]
     }
   ]
 }

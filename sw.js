@@ -1,11 +1,12 @@
-const CACHE_NAME = 'EAGLEBELAC-v2';  // Added -v2 for versioning
+const CACHE_NAME = 'EAGLEBELAC-v2';  
 
 const FILES_TO_CACHE = [
     './',
     'index.html',
     'manifest.json',
     'sw.js',
-    'icon-512.jpg',  // Fixed duplicate
+    'icon-512.jpg',  
+    'icon-192.jpg',
 
     // Audio files
     '1.mp3',
@@ -41,7 +42,7 @@ const FILES_TO_CACHE = [
     'assets/core/eeee.jpeg',
     'assets/core/eeeee.jpeg',
 
-    // BG 
+    // bg
     'assets/bg/1.jpeg',
     'assets/bg/11.jpeg',
     'assets/bg/111.jpeg',
@@ -72,7 +73,7 @@ const FILES_TO_CACHE = [
     'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'
 ];
 
-// Install → cache everything upfront
+// Install 
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)

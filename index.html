@@ -387,7 +387,7 @@
                 this.mesh.scale.setScalar(this.baseScale * (1 + pulse));
 
                 // TWEAK: More see-through (Lower opacity)
-                this.mesh.material.uniforms.opacity.value = progress * 0.8; 
+                this.mesh.material.uniforms.opacity.value = progress * 0.2; 
                 this.mesh.material.uniforms.glow.value = 1.0 + highEnergy;
                 return true;
             }

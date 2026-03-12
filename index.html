@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>EAGLEBELAC</title>
+    <style>
+        :root { --p: #ff0044; }
+        body { margin: 0; background: #000; height: 100vh; overflow: hidden; font-family: monospace; }
+        #bg { position: absolute; width: 100%; height: 100%; background-size: cover; background-position: center; transition: background 0.8s ease; }
+        #c { position: absolute; width: 100%; height: 100%; pointer-events: none; }
+        #ui { position: absolute; bottom: 0; width: 100%; height: 100px; display: flex; justify-content: space-around; align-items: center; background: rgba(0,0,0,0.6); border-top: 4px solid var(--p); }
+        .btn { width: 55px; height: 55px; border-radius: 50%; border: 3px solid var(--p); background: #000; color: #fff; cursor: pointer; font-size: 1.2rem; transition: 0.3s; }
+        .btn:active { transform: scale(0.92); }
+    </style>
+</head>
+<body>
+    <div id="bg"></div>
+    <canvas id="c"></canvas>
+    <div id="ui">
+        <button class="btn" id="prev">⏪</button>
+        <button class="btn" id="play">GO</button>
+        <button class="btn" id="next">⏩</button>
+        <button class="btn" id="colBtn">🎨</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script id="vShader" type="x-shader/x-vertex">
+        varying vec2 vUv;
+        varying float vDist;
+        uniform float time;
+        void main() {
+            vUv = uv;
+            vec3 pos = position;
+            pos += normal * sin(time * 2.0 + position.y * 0.5) * 0.3;
+            vDist = length(pos);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+        }
+    </script>
+
+    <script id="fShader" type="x-shader/x-fragment">
+        uniform float time, glow, bass, mid, high;
+        uniform sampler2D tex;
+        varying vec2 vUv;
+        varying float vDist;
+
+        vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
+        float noise(vec2 v){
+            const vec4 C=vec4(0.211324865405187,0.366025403784439,-0.577350269189626,0.024390243902439);
+            vec2 i=floor(v+dot(v,C.yy));vec2 x0=v-i+dot(i,C.xx);
+            vec2 i1=(x0.x>x0.y)?vec2(1.0,0.0):vec2(0.0,1.0);
+            vec4 x12=x0.xyxy+C.xxzz;x12.xy-=i1;i=mod289(i);
+            vec3 p=permute(permute(i.y+vec3(0.0,i1.y,1.0))+i.x+vec3(0.0,i1.x,1.0));
+            vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.0);
+            m=m*m;m=m*m;vec3 x=2.0*fract(p*C.www)-1.0;
+            vec3 h=abs(x)-0.5;vec3 a0=x-floor(x+0.5);
+            m*=1.79284291400159-0.85373472095314*(a0*a0+h*h);
+            vec3 g;g.x=a0.x*x0.x+h.x*x0.y;g.yz=a0.yz*x12.xz+h.yz*x12.yw;
+            return 130.0*dot(m,g);
+        }
+
+        void main(){
+            vec2 uv=vUv;
+            float n=noise(uv*8.0+time*0.3);
+            uv+=n*0.02*(bass+0.3);
+            uv.x+=sin(time*3.0+uv.y*10.0)*0.015*mid;
+            uv.y+=cos(time*2.5+uv.x*8.0)*0.012*high;
+            vec4 c=texture2D(tex,uv);
+            vec3 col=c.rgb;
+            col.r+=bass*0.4;col.g+=mid*0.3;col.b+=high*0.5;col=clamp(col,0.0,1.0);
+            float glowFalloff=1.0-smoothstep(0.2,0.8,vDist/30.0);
+            gl_FragColor=vec4(col*(glow*glowFalloff),c.a*glowFalloff);
+        }
+    </script>
+
+    <script>
+        // ────────────────────────────────────────────────
+        // EAGLEBELAC – FIXED & WORKING VERSION
+        // ────────────────────────────────────────────────
+
+        const tracks = ['1.mp3', '2.mp3', '3.mp3', '4.mp3', '5.mp3'];
+
+        const bgs = [
+            ['assets/bg/1.jpeg','assets/bg/11.jpeg','assets/bg/111.jpeg','assets/bg/1111.jpeg','assets/bg/11111.jpeg'],
+            ['assets/bg/2.jpeg','assets/bg/22.jpeg','assets/bg/222.jpeg','assets/bg/2222.jpeg','assets/bg/22222.jpeg'],
+            ['assets/bg/3.jpeg','assets/bg/33.jpeg','assets/bg/333.jpeg','assets/bg/3333.jpeg','assets/bg/33333.jpeg'],
+            ['assets/bg/4.jpeg','assets/bg/44.jpeg','assets/bg/444.jpeg','assets/bg/4444.jpeg','assets/bg/44444.jpeg'],
+            ['assets/bg/5.jpeg','assets/bg/55.jpeg','assets/bg/555.jpeg','assets/bg/5555.jpeg','assets/bg/55555.jpeg']
+        ];
+
+        const coreTextures = [
+            ['assets/core/a.jpeg','assets/core/aa.jpeg','assets/core/aaa.jpeg','assets/core/aaaa.jpeg','assets/core/aaaaa.jpeg'],
+            ['assets/core/b.jpeg','assets/core/bb.jpeg','assets/core/bbb.jpeg','assets/core/bbbb.jpeg','assets/core/bbbbb.jpeg'],
+            ['assets/core/c.jpeg','assets/core/cc.jpeg','assets/core/ccc.jpeg','assets/core/cccc.jpeg','assets/core/ccccc.jpeg'],
+            ['assets/core/d.jpeg','assets/core/dd.jpeg','assets/core/ddd.jpeg','assets/core/dddd.jpeg','assets/core/ddddd.jpeg'],
+            ['assets/core/e.jpeg','assets/core/ee.jpeg','assets/core/eee.jpeg','assets/core/eeee.jpeg','assets/core/eeeee.jpeg']
+        ];
+
+        const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3', '#FF1493', '#00FFFF', '#FF00FF', '#7FFF00', '#DC143C', '#00CED1', '#FFD700', '#ADFF2F', '#40E0D0', '#FF4500', '#DA70D6', '#EEE8AA', '#98FB98', '#AFEEEE', '#D8BFD8', '#FF6347', '#4682B4', '#D2691E', '#9ACD32', '#BA55D3', '#20B2AA', '#87CEFA', '#778899'];
+
+        let tIdx = 0, aIdx = 0, cIdx = 0;
+        let currentAudio = null;
+        let audioContext, analyser, currentSource;
+
+        const loader = new THREE.TextureLoader();
+        loader.setCrossOrigin('anonymous');
+
+        // ─── Three.js Setup ────────────────────────────────────────
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+        renderer.setClearColor(0x000000, 0);
+
+        const uniforms = {
+            time: { value: 0 },
+            glow: { value: 2.0 },
+            tex: { value: null },
+            bass: { value: 0 },
+            mid: { value: 0 },
+            high: { value: 0 }
+        };
+
+        const mainCore = new THREE.Mesh(
+            new THREE.SphereGeometry(18, 128, 128),
+            new THREE.ShaderMaterial({
+                uniforms,
+                vertexShader: document.getElementById('vShader').textContent,
+                fragmentShader: document.getElementById('fShader').textContent,
+                transparent: true
+            })
+        );
+        scene.add(mainCore);
+        camera.position.z = 70;
+
+        // Resize handler
+        function resize() {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // ─── Audio Setup ───────────────────────────────────────────
+        async function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 1024;
+                analyser.smoothingTimeConstant = 0.6;
+            }
+            if (audioContext.state === 'suspended') await audioContext.resume();
+        }
+
+        function switchTrack(dir = 0) {
+            initAudio();
+
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+                if (currentSource) currentSource.disconnect();
+            }
+
+            tIdx = (tIdx + dir + 5) % 5;
+            currentAudio = new Audio(tracks[tIdx]);
+            currentSource = audioContext.createMediaElementSource(currentAudio);
+            currentSource.connect(analyser);
+            analyser.connect(audioContext.destination);
+
+            currentAudio.play().catch(e => console.log("Play failed:", e));
+            document.getElementById('play').textContent = 'PAUSE';
+
+            // Load core texture
+            loader.load(coreTextures[tIdx][0], tex => {
+                tex.flipY = false;
+                tex.encoding = THREE.sRGBEncoding;
+                uniforms.tex.value = tex;
+                mainCore.material.needsUpdate = true;
+            }, undefined, err => console.error("Texture load error:", err));
+
+            // Reset background cycle
+            aIdx = 0;
+            document.getElementById('bg').style.backgroundImage = `url(${bgs[tIdx][0]})`;
+        }
+
+        // ─── Animation Loop ────────────────────────────────────────
+        function animate(time = 0) {
+            requestAnimationFrame(animate);
+
+            if (analyser) {
+                const data = new Uint8Array(analyser.frequencyBinCount);
+                analyser.getByteFrequencyData(data);
+                let b = 0, m = 0, h = 0;
+                for (let i = 0; i < data.length; i++) {
+                    if (i < data.length * 0.2) b += data[i];
+                    else if (i < data.length * 0.6) m += data[i];
+                    else h += data[i];
+                }
+                uniforms.bass.value = b / (data.length * 0.2 * 255);
+                uniforms.mid.value  = m / (data.length * 0.4 * 255);
+                uniforms.high.value = h / (data.length * 0.4 * 255);
+            }
+
+            uniforms.time.value = time * 0.001;
+            mainCore.rotation.y += 0.005 + uniforms.bass.value * 0.02;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // ─── UI Handlers ───────────────────────────────────────────
+        document.getElementById('play').onclick = () => {
+            initAudio().then(() => {
+                if (!currentAudio) {
+                    switchTrack(0);
+                } else if (currentAudio.paused) {
+                    currentAudio.play();
+                    document.getElementById('play').textContent = 'PAUSE';
+                } else {
+                    currentAudio.pause();
+                    document.getElementById('play').textContent = 'GO';
+                }
+            });
+        };
+
+        document.getElementById('prev').onclick = () => switchTrack(-1);
+        document.getElementById('next').onclick = () => switchTrack(1);
+
+        document.getElementById('colBtn').onclick = () => {
+            cIdx = (cIdx + 1) % colors.length;
+            document.documentElement.style.setProperty('--p', colors[cIdx]);
+            document.querySelectorAll('.btn').forEach(b => b.style.borderColor = colors[cIdx]);
+            document.getElementById('ui').style.borderTopColor = colors[cIdx];
+        };
+
+        // Background auto-cycle
+        setInterval(() => {
+            aIdx = (aIdx + 1) % 5;
+            document.getElementById('bg').style.backgroundImage = `url(${bgs[tIdx][aIdx]})`;
+        }, 10000);
+
+        // Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').catch(console.error);
+        }
+
+        // Start with first background
+        document.getElementById('bg').style.backgroundImage = `url(${bgs[0][0]})`;
+    </script>
+</body>
+</html>

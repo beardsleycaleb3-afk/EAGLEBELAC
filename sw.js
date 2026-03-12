@@ -13,7 +13,7 @@ const PRECACHE_FILES = [
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
 
   // Icons (make sure these files actually exist in root)
-  '/icon.jpg',
+  '/icon-192.jpg',
   '/icon-512.jpg',
 
   // All audio tracks
@@ -91,10 +91,10 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('[SW] Pre-caching all core assets');
+        console.log('[sw] Pre-caching all core assets');
         return cache.addAll(PRECACHE_FILES)
           .catch(err => {
-            console.warn('[SW] Some assets failed to cache during install:', err);
+            console.warn('[sw] Some assets failed to cache during install:', err);
             // Continue anyway – partial cache is still useful
           });
       })

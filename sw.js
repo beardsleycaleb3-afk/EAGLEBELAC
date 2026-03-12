@@ -1,7 +1,7 @@
 // sw.js – SULTAN47 EAGLEBELAC PWA Service Worker
 // Updated: includes every referenced asset for full offline caching
 
-const CACHE_NAME = 'EAGLEBELAC-v7';
+const CACHE_NAME = 'EAGLEBELAC';
 
 // Core page + libraries
 const PRECACHE_FILES = [

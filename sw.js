@@ -1,4 +1,4 @@
-const CACHE_NAME = 'EAGLEBELAC-v4'; // Bump version for update
+const CACHE_NAME = 'EAGLEBELAC-v3'; // Bump version for update
 const FILES_TO_CACHE = [
     'index.html',           // Fixed: no ./ root
     'manifest.json',

@@ -20,10 +20,10 @@
     <div id="bg"></div>
     <canvas id="c"></canvas>
     <div id="ui">
-        <button class="btn" id="prev">⏪</button>
-        <button class="btn" id="play">GO</button>
-        <button class="btn" id="next">⏩</button>
-        <button class="btn" id="colBtn">🎨</button>
+        <button class="btn" id="prev">👻</button>
+        <button class="btn" id="play">⏯️</button>
+        <button class="btn" id="next">🌶️</button>
+        <button class="btn" id="colBtn">🤯</button>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -83,7 +83,7 @@
 
         const tracks = ['1.mp3', '2.mp3', '3.mp3', '4.mp3', '5.mp3'];
 
-        const bgs = [
+        const bgs = [ 'src = assets/bg/',
             ['assets/bg/1.jpeg','assets/bg/11.jpeg','assets/bg/111.jpeg','assets/bg/1111.jpeg','assets/bg/11111.jpeg'],
             ['assets/bg/2.jpeg','assets/bg/22.jpeg','assets/bg/222.jpeg','assets/bg/2222.jpeg','assets/bg/22222.jpeg'],
             ['assets/bg/3.jpeg','assets/bg/33.jpeg','assets/bg/333.jpeg','assets/bg/3333.jpeg','assets/bg/33333.jpeg'],
@@ -91,7 +91,7 @@
             ['assets/bg/5.jpeg','assets/bg/55.jpeg','assets/bg/555.jpeg','assets/bg/5555.jpeg','assets/bg/55555.jpeg']
         ];
 
-        const coreTextures = [
+        const coreTextures = [ 'src = assets/core/',
             ['assets/core/a.jpeg','assets/core/aa.jpeg','assets/core/aaa.jpeg','assets/core/aaaa.jpeg','assets/core/aaaaa.jpeg'],
             ['assets/core/b.jpeg','assets/core/bb.jpeg','assets/core/bbb.jpeg','assets/core/bbbb.jpeg','assets/core/bbbbb.jpeg'],
             ['assets/core/c.jpeg','assets/core/cc.jpeg','assets/core/ccc.jpeg','assets/core/cccc.jpeg','assets/core/ccccc.jpeg'],
@@ -221,18 +221,18 @@
                     switchTrack(0);
                 } else if (currentAudio.paused) {
                     currentAudio.play();
-                    document.getElementById('play').textContent = 'PAUSE';
+                    document.getElementById('play').textContent = '⏯️';
                 } else {
                     currentAudio.pause();
-                    document.getElementById('play').textContent = 'GO';
+                    document.getElementById('play').textContent = '⏯️';
                 }
             });
         };
 
-        document.getElementById('prev').onclick = () => switchTrack(-1);
-        document.getElementById('next').onclick = () => switchTrack(1);
+        document.getElementById('prev').onclick = ('👻') => switchTrack(-1);
+        document.getElementById('next').onclick = ('🌶️') => switchTrack(1);
 
-        document.getElementById('colBtn').onclick = () => {
+        document.getElementById('colBtn').onclick = ('🤯') => {
             cIdx = (cIdx + 1) % colors.length;
             document.documentElement.style.setProperty('--p', colors[cIdx]);
             document.querySelectorAll('.btn').forEach(b => b.style.borderColor = colors[cIdx]);
@@ -250,8 +250,8 @@
             navigator.serviceWorker.register('./sw.js').catch(console.error);
         }
 
-        // Start with first background
-        document.getElementById('bg').style.backgroundImage = `url(${bgs[0][0]})`;
+        // 
+        document.getElementById('bg').style.backgroundImage = (`src = assets/bg/1.jpeg');
     </script>
 </body>
 </html>
